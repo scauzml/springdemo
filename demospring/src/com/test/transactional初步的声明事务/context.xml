@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop.xsd">
+    <bean id="fooService" class="com.test.transactional初步的声明事务.DefaultFooServiceImpl"/>
+<tx:advice id="txAdvice" transaction-manager="txManager">
+    <tx:attributes>
+        <!--get开头的方法都只使用读的事务上下文-->
+        <tx:method name="get*" read-only="true"/>
+        <!--其他使用默认的事务-->
+        <tx:method name="*"/>
+    </tx:attributes>
+</tx:advice>
+    <!--回滚声明性事务-->
+    <tx:advice id="txAdvice1" transaction-manager="txManager">
+        <tx:attributes>
+            <tx:method name="get*"  read-only="true" rollback-for="NoProductInStockException"/>
+            <tx:method name="*"/>
+        </tx:attributes>
+    </tx:advice>
+    <!--使用aop来设定txAdvice bean所关联的类的方法和切入点-->
+    <aop:config>
+        <aop:pointcut id="fooServiceOperation" expression="execution(* com.test.transactional初步的声明事务.FooService.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="fooServiceOperation"/>
+    </aop:config>
+    <!--定义数据源-->
+    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
+        <property name="driverClassName" value="oracle.jdbc.driver.OracleDriver"/>
+        <property name="url" value=""/>
+        <property name="username" value=""/>
+        <property name="password" value=""/>
+    </bean>
+    <!--定义事务管理器-->
+    <bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+</beans>

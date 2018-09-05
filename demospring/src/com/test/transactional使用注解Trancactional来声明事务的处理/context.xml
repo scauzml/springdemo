@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="fooService" class="com.test.transactional使用注解Trancactional来声明事务的处理.DefaultFooServiceImpl"/>
+    <!--启动注解来处理事务-->
+    <bean id="txMagger" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSoruce"/>
+    </bean>
+</beans>
